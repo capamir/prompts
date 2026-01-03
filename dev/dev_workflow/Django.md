@@ -1,81 +1,69 @@
-# 🐍 Stage 2: Django Implementation Workflow (v2026.1)
+# 🐍 Stage 2: Django Implementation Workflow (v2026.2)
 
 ## 🎯 Primary Objective
 
-To implement approved architectural designs into a stable, secure, and idiomatic Django application. This document governs the Implementation and Validation phases [cite: Copilot Phase 4-5].
+To implement approved architectural designs into a stable, secure, and idiomatic Django application. This document governs the Implementation and Validation phases for backend development [cite: master_workflow 4].
 
 ## 🚦 Rule of Engagement: The "Django Investigation"
 
-Before generating any code, you must perform a Deep Investigation of:
+Before generating any code, you MUST perform a Deep Investigation of:
 
-models.py & apps.py: To ensure alignment with the database schema and app registry.
+Authoritative State: Review models.py and DB constraints to ensure invariants are enforced at the database level [cite: master_workflow 2].
 
-settings.py: To check for installed apps, middleware, and environment variables.
+Existing Service Layer: Check services.py or selectors.py to maintain separation of concerns.
 
-Current Migrations: To avoid state drift or conflicting schema changes.
+Migration History: Verify the current state of migrations to avoid schema drift.
 
-## 🏗 Django-Specific Implementation Standards
+## 🏗️ Django-Specific Implementation Standards
 
-### 1. The "Fat Model / Service Layer" Choice
+1. Invariants & Correctness (Backend First)
 
-Small Apps: Keep logic in Models (Fat Models).
+** Authoritative Constraints:** Prefer DB-level unique indexes and constraints for data invariants [cite: master_workflow 2, 8.1].
 
-Complex Apps: Use a services.py or selectors.py layer to keep Business Logic separate from the Database and Views [cite: AGENTS Rule 10].
+Atomic Operations: Use transaction.atomic() for any operation involving multiple database writes.
 
-Views: Views must remain "Thin," handling only request parsing and response formatting.
+Writes Decide, Reads Inform: Avoid "check-then-act" logic (TOCTOU races). Use update() with filters or select_for_update() [cite: master_workflow 2, 8.2].
 
-### 2. Data Integrity & Types
+2. Architecture: Fat Models, Thin Views, Services
 
-Django Ninja/Pydantic: Use for API definitions to ensure strict type validation similar to Go [cite: AGENTS Rule 21].
+Business Logic: Must live in the Service Layer (services.py). Views handle only request/response; Models handle only data definitions [cite: AGENTS Rule 10].
 
-Type Hints: All functions must include Python type hints for clarity and IDE support.
+Strict Typing: Use Python type hints and Pydantic/Ninja schemas for all API contracts to ensure explicit behavior [cite: AGENTS Rule 21].
 
-ORM Excellence: Use .select_related() and .prefetch_related() to prevent N+1 query problems.
+3. Performance & API Integrity
 
-### 3. Safety & Security
+ORM Optimization: Always use .select_related() and .prefetch_related() to eliminate N+1 queries.
 
-Migrations: Every model change must include a plan for makemigrations. Never skip migration files.
-
-Input Sanitization: Trust nothing. Use Django Forms or Pydantic for all external input validation [cite: AGENTS Rule 42].
-
-Environment Variables: Never hardcode SECRET_KEY, DEBUG, or DB credentials [cite: AGENTS Rule 24].
+Idempotency: Make retryable API operations safe to call multiple times [cite: master_workflow 11].
 
 ## 🧱 Atomic Task Specification (Django)
 
-For every sub-task, generate a spec using this checklist:
+For every approved task from Stage 1, generate a spec including:
 
-Scope: Which specific App and Files are being modified?
+Given: Initial DB state and context.
 
-Logic: What is the specific ORM or Business logic change?
+When: The specific ORM/Service action.
 
-Migrations: Does this require a schema update?
+Then: Expected outcome and DB state.
 
-Tests: Which TestCase class or pytest function validates this?
+Acceptance Criteria: Behavioral Given/When/Then contracts [cite: AGENTS Rule 15].
 
-## 🧪 Validation & Testing (The Django Pyramid)
+## 🧪 Implementation Discipline
 
-Unit Tests: Test models and service functions in isolation (mock external APIs).
+Atomic Commits: feat(<app>): <summary> – one logical change per commit [cite: git 3.3].
 
-Integration Tests: Test Views and API endpoints using the Django Client or RequestFactory.
+No Hallucinated Docs: Cite actual file paths and function names in all comments/logs [cite: docs.md].
 
-Schema Check: Verify python manage.py check and makemigrations --check pass.
+Struggle Briefly: Use AI for boilerplate; keep ownership of business logic [cite: master_template Step 6].
 
-## 🏷 Git & Documentation Discipline
+### ✅ Completion Checklist (Rule 66)
 
-Commit Format: feat(app-name): <summary> or fix(models): <summary> [cite: git 3.1].
+[ ] No hardcoded secrets (use .env).
 
-Docstrings: Use PEP 257 docstrings for every class, method, and view.
+[ ] All I/O is documented and handled (timeouts, retries).
 
-Project Log: Update /docs/logs/init_log.txt after every validated task [cite: git 5.1].
+[ ] Migrations are generated and reversible.
 
-## ✅ Completion Checklist (Rule 66)
+[ ] No print() statements; use standard logging.
 
-[ ] flake8 / ruff / black formatting passes.
-
-[ ] All new migrations are tested and reversible.
-
-[ ] No print() statements; use logging.
-
-[ ] coverage meets the 80% threshold for the modified app.
-
-Quick Start: "Django Workflow initialized. Architecture is approved. Please provide the specific Feature ID or ADR we are implementing. I will investigate the existing app structure before proposing Task 1.1."
+Quick Start: "Django Workflow v2026.2 initialized. Architecture is approved. Please provide the Task ID or ADR. I will investigate the models.py and services.py boundaries before proposing Task 2.1."
