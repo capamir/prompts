@@ -1,85 +1,77 @@
-# ⚛️ Stage 2: Next.js & React Implementation Workflow (v2026.1)
+# ⚛️ Stage 2: Next.js & React Implementation Workflow (v2026.2)
 
 ## 🎯 Primary Objective
 
-To transform high-fidelity Figma designs into performant, accessible, and beautifully animated React applications. This document governs the Implementation and Validation phases for frontend development [cite: Copilot Phase 4-5].
+To transform high-fidelity Figma designs into performant, accessible, and beautifully animated React applications. This document governs the Implementation and Validation phases for frontend development [cite: master_workflow 4].
 
 ## 🚦 Rule of Engagement: The "Frontend Investigation"
 
-Before writing any JSX/TSX, you must perform a Deep Investigation of:
+Before generating any JSX/TSX, you MUST perform a Deep Investigation of:
 
-Design Specs: Review Figma/design layouts for spacing, typography, and color tokens.
+Design Specs: Review Figma/design tokens for spacing, typography, and color scales to ensure pixel-perfect fidelity.
 
-Existing Component Library: Identify reusable atoms/molecules to prevent duplication (DRY) [cite: AGENTS Rule 7].
+Existing Component Library: Identify reusable atoms/molecules to prevent duplication (DRY) and maintain visual consistency [cite: AGENTS Rule 7].
 
-State Architecture: Determine if the task requires local state (useState), shared state (Context), or server-side data fetching.
+State & Data Architecture: Determine if the task requires Server Components (RSC), local state (useState), or shared context/server actions.
 
-Tailwind Configuration: Verify available design tokens in tailwind.config.js.
+Authoritative Invariants: Define frontend invariants (e.g., "The modal must never be open without an overlay", "Form validation must block submission") [cite: master_template Principle 0].
 
-## 🏗 Next.js & React Implementation Standards
+## 🏗️ Next.js & React Implementation Standards
 
-### 1. Component Architecture & Patterns
+1. Component Architecture (RSC & Client Isolation)
 
-Server Components (RSC) by Default: Fetch data and render logic on the server to minimize client-side bundle size.
+Server-First Design: Use React Server Components (RSC) for data fetching and static rendering to minimize client-side bundles.
 
-Client Component Isolation: Use 'use client' only for interactive elements or hooks (animations, state, effects).
+Client Component Isolation: Mark components with 'use client' only when strictly necessary for interactivity, hooks, or animations.
 
-Atomic Design Principles: Structure components into atoms, molecules, and organisms where appropriate for scalability.
+Atomic Design: Organize the file structure into atoms, molecules, and organisms to maintain a scalable component hierarchy.
 
-### 2. Styling & Layout (The Visual Code)
+2. Styling & Layout (Responsive Excellence)
 
-Tailwind CSS Excellence: Use utility classes for styling. Avoid arbitrary values; stick to the theme.
+Tailwind CSS Tokens: Use utility classes derived from the theme. Avoid arbitrary values; if a custom value is needed, add it to tailwind.config.js.
 
-Responsive-First Design: Always build for mobile first using Tailwind's sm:, md:, and lg: prefixes [cite: Universal 3.1].
+Responsive-First: Always build for mobile-first using Tailwind's sm:, md:, and lg: prefixes [cite: Universal 3.1].
 
-Accessibility (a11y): Use semantic HTML (e.g., <main>, <section>, <nav>) and ARIA labels.
+Accessibility (a11y): Use semantic HTML and ensure every interactive element is keyboard-navigable and screen-reader friendly (ARIA labels).
 
-### 3. Animation & Interaction (Framer Motion / GSAP)
+3. Animation & Interaction (Framer Motion / GSAP)
 
-Declarative Animations: Use Framer Motion for layout transitions and simple interactions.
+Declarative Animations: Use Framer Motion for layout transitions and simple interactive states (e.g., hover, tap).
 
-Complex Timelines: Use GSAP for high-performance, complex scroll-based or multi-step animations.
+Performance-Critical UI: Use GSAP for complex, timeline-based, or scroll-triggered animations that require high-performance rendering.
 
-Reduced Motion: Always respect prefers-reduced-motion settings for accessibility.
+Reduced Motion: Always respect prefers-reduced-motion settings to ensure accessibility for all users.
 
 ## 🧱 Atomic Task Specification (Frontend)
 
-For every UI task, generate a spec including:
+For every approved task from Stage 1, generate a spec including:
 
-Visual Goal: Describe the design-to-code target.
+Visual Goal: A clear description of the design-to-code target.
 
-Component Signature: Define props (interfaces) and whether it's an RSC or Client Component.
+Component Signature: Define props (interfaces), state requirements, and whether it's an RSC or Client Component.
 
-Animation Strategy: Define the triggers (e.g., whileInView, layoutId) and easing.
+Animation Strategy: Define the triggers (e.g., whileInView, layoutId) and the easing/duration parameters.
 
-Validation: Specify the visual check and the unit test file.
+Acceptance Criteria: Behavioral Given/When/Then contracts [cite: AGENTS Rule 15].
 
-## 🧪 Validation & Testing (The Frontend Pyramid)
+## 🧪 Implementation Discipline
 
-Component Tests: Use React Testing Library to verify user interactions and accessibility.
+Atomic Commits: feat(ui): <summary> – one logical change per commit [cite: git 3.3].
 
-Visual Regression: Perform manual/automated checks against Figma designs.
+No Hallucinated Docs: Cite actual file paths and component names in all comments/logs [cite: docs.md].
 
-Performance Audit: Check Lighthouse scores, focusing on LCP (Largest Contentful Paint) and CLS (Cumulative Layout Shift).
+Struggle Briefly: Use AI for boilerplate; keep ownership of component logic, accessibility contracts, and animation timing [cite: master_template Step 6].
 
-🏷 Git & Documentation Discipline
+### ✅ Completion Checklist (Rule 66)
 
-Commit Format: feat(ui): <summary> or fix(animation): <summary> [cite: git 3.1].
+[ ] Tailwind arbitrary values are used only where theme-extension is impossible.
 
-TSDoc: Document every public prop and complex hook using TSDoc/JSDoc format.
+[ ] Accessibility audit (e.g., axe-core) reports zero critical violations.
 
-Project Log: Update /docs/logs/init_log.txt after visual validation [cite: git 5.1].
+[ ] Animations are fluid (60fps) and do not cause Layout Shift (CLS).
 
-## ✅ Completion Checklist (Rule 66)
+[ ] TypeScript types are strict; no use of any or @ts-ignore.
 
-[ ] No Tailwind arbitrary values (unless absolutely necessary).
+[ ] All console.log and debug fragments are removed before commit.
 
-[ ] Accessibility audit passed (no broken tabIndex or missing alt tags).
-
-[ ] Animations are fluid (60fps) and non-blocking.
-
-[ ] Types are strict (no any).
-
-[ ] Clean up all console.log and debug fragments.
-
-Quick Start: "Next.js & React Workflow initialized. Architecture and Design are approved. Please provide the Figma spec or Component ID we are building. I will investigate the existing theme and component tree before proposing Task 1.1."
+Quick Start: "Next.js & React Workflow v2026.2 initialized. Architecture and Design are approved. Please provide the Figma spec or Component ID. I will investigate the existing theme and component tree before proposing Task 2.1."
