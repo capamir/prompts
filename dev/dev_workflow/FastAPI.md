@@ -1,12 +1,12 @@
-# ⚡ Stage 2: FastAPI Implementation Workflow (v2026.1)
+# ⚡ Stage 2: FastAPI Implementation Workflow (v2026.2)
 
 ## 🎯 Primary Objective
 
-To implement approved architectural designs into high-performance, type-safe, and asynchronous Python backends. This document governs the Implementation and Validation phases for FastAPI development [cite: Copilot Phase 4-5].
+To implement approved architectural designs into high-performance, type-safe, and asynchronous Python backends. This document governs the Implementation and Validation phases for FastAPI development [cite: master_workflow 4].
 
 ## 🚦 Rule of Engagement: The "FastAPI Investigation"
 
-Before generating any code, you must perform a Deep Investigation of:
+Before generating any code, you MUST perform a Deep Investigation of:
 
 Pydantic Schemas: Review existing BaseModel definitions to ensure strict data validation and avoid duplicate schemas.
 
@@ -14,70 +14,62 @@ Dependency Injection (DI) Tree: Identify existing dependencies (e.g., Auth, DB s
 
 Async Safety: Verify that all planned I/O operations (DB, external APIs) are handled asynchronously to prevent blocking the event loop.
 
-Middleware & Routers: Check the current routing structure and middleware stack for cross-cutting concerns (CORS, Logging, Auth).
+Authoritative State: Review database constraints and Pydantic validators to ensure invariants are preserved at the entry point [cite: master_workflow 2].
 
-## 🏗 FastAPI-Specific Implementation Standards
+## 🏗️ FastAPI-Specific Implementation Standards
 
-### 1. Pydantic v2+ & Type Safety
+1. Invariants & Correctness (Pydantic & Pythonic Rigor)
 
-Strict Modeling: Use Pydantic v2 for all Request/Response bodies. Prefer BaseModel with explicit field descriptions and validation.
+Strict Modeling: Use Pydantic v2 for all Request/Response bodies. Prefer BaseModel with explicit field descriptions and validation. Use Strict=True where data integrity is critical [cite: AGENTS Rule 21].
 
-Type Annotations: Use Python's Annotated type for dependencies and complex metadata to keep function signatures clean.
+Writes Decide, Reads Inform: Avoid "check-then-act" patterns (TOCTOU races). Use database-level atomicity and async-safe locks for shared state [cite: master_workflow 2].
 
-Schema Evolution: Ensure response models are explicit (response_model) to prevent leaking internal database fields.
+Explicitness: All function signatures must use type hints and Annotated for dependencies to ensure clear contracts [cite: AGENTS Rule 13].
 
-### 2. Asynchronous Excellence
+2. Asynchronous Excellence
 
-Non-Blocking I/O: Every external call must use async/await. Use httpx for external requests and an async driver (like SQLAlchemy + aiopg/asyncpg) for databases.
+Non-Blocking I/O: Every external call must use async/await. Use httpx for external requests and an async driver (like SQLAlchemy + asyncpg) for databases.
 
-Background Tasks: Offload long-running processes to BackgroundTasks or Celery, keeping the request-response cycle fast.
+Background Tasks: Offload long-running processes to BackgroundTasks or a distributed worker (Celery/TaskIQ) to keep the request-response cycle fast.
 
-### 3. Architecture & Dependency Injection
+Concurrency Safety: Understand the event loop; avoid CPU-bound tasks in async routes—delegate them to thread pools or separate processes.
 
-Router Modularity: Group endpoints into APIRouter instances by domain (e.g., /users, /orders).
+3. Architecture & Dependency Injection
 
-Explicit DI: Favor FastAPI's Depends() for service injection over global singletons to ensure code is easily mockable in tests [cite: AGENTS Rule 13].
+Service Layer Pattern: Isolate complex business logic into standalone service classes/functions, keeping endpoints "thin" [cite: AGENTS Rule 10].
 
-Service Layer Pattern: Isolate complex business logic into standalone service classes/functions, keeping endpoints thin.
+Explicit DI: Favor FastAPI's Depends() for service injection over global singletons to ensure code is easily mockable in tests.
+
+Router Modularity: Group endpoints into APIRouter instances by domain (e.g., /users, /orders) to maintain separation of concerns.
 
 ## 🧱 Atomic Task Specification (FastAPI)
 
-For every sub-task, generate a spec including:
+For every approved task from Stage 1, generate a spec including:
 
-Endpoint Signature: Method (GET/POST/etc.), Path, and explicit input/output Schemas.
+Given: Initial state, endpoint signatures, and required Pydantic models.
 
-Dependency Chain: List all required dependencies (Auth, DB, Custom).
+When: The specific Service logic or API action.
 
-Business Logic: Define the data transformation or service call required.
+Then: Expected outcome, Response Schema, and HTTP status codes.
 
-Validation: Specify the pytest file and the expected OpenAPI schema change.
+Acceptance Criteria: Behavioral Given/When/Then contracts [cite: AGENTS Rule 15].
 
-## 🧪 Validation & Testing (The Python Pyramid)
+## 🧪 Implementation Discipline
 
-Async Unit Tests: Use pytest-asyncio and httpx.AsyncClient to test endpoints and services.
+Atomic Commits: feat(api): <summary> – one logical change per commit [cite: git 3.3].
 
-OpenAPI Compliance: Verify that the generated /docs (Swagger) matches the implementation and requirements.
+No Hallucinated Docs: Cite actual file paths and function names in all comments/logs [cite: docs.md].
 
-Static Analysis: Enforce type checking with mypy and linting with ruff to catch errors before runtime.
+Struggle Briefly: Use AI for boilerplate; keep ownership of business logic, async safety, and invariant enforcement [cite: master_template Step 6].
 
-🏷 Git & Documentation Discipline
+### ✅ Completion Checklist (Rule 66)
 
-Commit Format: feat(api): <summary> or fix(schema): <summary> [cite: git 3.1].
+[ ] ruff (linter) and mypy (type checker) pass with zero errors.
 
-Google Style Docstrings: Use standard Python docstrings for every endpoint and service function.
+[ ] OpenAPI documentation is accurate and includes examples/descriptions.
 
-Project Log: Update /docs/logs/init_log.txt after every passing test suite [cite: git 5.1].
+[ ] All I/O operations are confirmed asynchronous and non-blocking.
 
-## ✅ Completion Checklist (Rule 66)
+[ ] Error handling uses HTTPException with meaningful status codes—no stack traces leaked.
 
-[ ] ruff and mypy pass with zero errors.
-
-[ ] OpenAPI documentation is accurate and includes examples.
-
-[ ] All I/O operations are confirmed asynchronous.
-
-[ ] No print() statements; use standard Python logging.
-
-[ ] Error handling uses HTTPException with meaningful status codes and detail.
-
-Quick Start: "FastAPI Workflow initialized. Architecture is approved. Please provide the specific Endpoint ID or ADR we are building. I will investigate the Pydantic model hierarchy and dependency tree before proposing Task 1.1."
+Quick Start: "FastAPI Workflow v2026.2 initialized. Architecture is approved. Please provide the Task ID or ADR. I will investigate the Pydantic model hierarchy and dependency tree before proposing Task 2.1."
